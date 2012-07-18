@@ -79,7 +79,7 @@ void Sort(T data[], int arrSize)
 	stack< pair <int, int> >* cake;
 
 	int index1 = 0;
-	int size1 = 3;
+	int size1 = 5;
 	int index2 = size1;
 	int size2= arrSize-size1;  
 	int runSize = arrSize;
@@ -269,9 +269,9 @@ void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
 	//Hmmm. should i use vector or not?
 	T* arr2  = new T[size2];
 
-	for(int i =begin2; i< begin2+size1; i++)
+	for(int i =begin2; i< begin2+size2; i++)
 	{
-		arr2[i-begin1] = data[i];
+		arr2[i-begin2] = data[i];
 	}
 
 	int i1 = begin1+size1 -1;//end index of first array
@@ -292,15 +292,15 @@ void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
 	{	
 
 		//copy the contents of secondArray
-		for(int i  = i3; i2 >= begin2  ; i-- )
+		for(int i  = i3; i2 >= 0  ; i-- )
 		{
 			data[i] = arr2[i2--];
 		}
 	}
 	else
-		for(int i = i3; i >= size1-i1; i--)
+		for(int i = i3; i1 >= begin1; i--)
 		{
-			data[i3+i] = data[i1+i];
+			data[i] = data[i1--];
 		}
 		
 	delete [] arr2; 
