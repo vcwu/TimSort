@@ -33,14 +33,25 @@ void reverseElem(T argh[], int index, int size);
 /**
 insertionSort
 
-Does what it says on the tin.
+Uses insertion sort to sort a chunk of the array.
 */
+
 template <typename T>
 void insertionSort(T data[], int index, int size);
 
 
 /**
+merge
+
+Merges two chunks of the array together. 
+Ideally, done in place, and with gallop mode too.
 */
+template <typename T>
+void mergeUp(T data[], int index1, int size1, int index2, int size2);
+
+/**
+*/
+
 template <typename T>
 void insert(stack< pair <int, int> >* cake, int begin, int size);
 
@@ -56,7 +67,42 @@ void Sort(T data[], int arrSize)
 	int runSize = arrSize;
 	reverseElem(data, begin, runSize);
 
-	insertionSort(data, begin, runSize);
+	cout<< endl << "after reversing" << endl;
+	for( int i =0; i< arrSize;  i++)
+	{
+		
+		cout << data[i];
+		cout << " " ;
+	}
+
+	insertionSort(data, begin, 5);
+	cout<< endl << "after insertion sort" << endl;
+	for( int i =0; i< arrSize;  i++)
+	{
+		
+		cout << data[i];
+		cout << " " ;
+	}
+	insertionSort(data, 5, 5);
+
+	cout<< endl << "after insertion sort" << endl;
+	for( int i =0; i< arrSize;  i++)
+	{
+		
+		cout << data[i];
+		cout << " " ;
+	}
+
+	mergeUp(data, begin , 5, 5, 5);
+
+	cout<< endl << "after merging" << endl;
+	for( int i =0; i< arrSize;  i++)
+	{
+		
+		cout << data[i];
+		cout << " " ;
+	}
+	cout << endl;
 
 	/*
 	Step through array, and process.
@@ -131,11 +177,11 @@ void insertionSort(T data[], int index, int size)
 	int i , j;
 	T temp;
 
-	for(i =1; i < size; i++)
+	for(i =index; i < index+ size; i++)
 	{
 		temp = data[i];
 		j = i;
-		while(j > 0 && temp < data[j-1])
+		while(j > index && temp < data[j-1])
 		{
 			data [j] = data[j-1];
 			j--;
@@ -147,6 +193,66 @@ void insertionSort(T data[], int index, int size)
 
 
 };
+
+template <typename T>
+void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
+{
+	//Naive merge base taken from 
+	//"Data Structures And Algorithms in C++ " by Adam Drozdek
+	// 9.3.4, page 364
+
+	//Make two separate arrays, to make room to write 
+	//to original array.
+
+	//Obviously, this is NOT going to work well for 
+	//a lot of elements. I'll implement the inplace sort later..
+
+	T* arr1  = new T[size1];
+
+	for(int i =begin1; i< begin1+size1; i++)
+	{
+		arr1[i-begin1] = data[i];
+	}
+	
+
+	//T* arr2 = new T[size2];
+
+	int i1 = 0;			//index of first array
+	int i2 = begin2;	//index of second array
+	int i3 = begin1;	//index we are inserting into
+
+	//Once we reach the end of an array...
+	while(i1 < size1 && i2 < begin2+size2)
+	{
+		if(arr1[i1] < data[i2])
+			data[i3++] = arr1[i1++];
+		else
+			data[i3++] = data[i2++];
+	}
+
+	//Load the remaining stuff. 
+	if(i1 == size1)		//firstArray is allready in
+	{	
+
+		//copy the contents of secondArray
+		for(int i = 0; i < i2-begin2; i++ )
+		{
+			data[i3+i] = data[i2+i];
+		}
+	}
+	else
+		for(int i =0; i < size1-i1; i++)
+		{
+			data[i3+i] = arr1[i1+i];
+		}
+
+	
+
+
+	delete [] arr1; 
+//	delete [] arr2;
+	
+}
 
 /*
 template <typename T>
