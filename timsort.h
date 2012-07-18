@@ -30,6 +30,14 @@ into an ascending run by swapping elements in place.
 template <class T>
 void reverseElem(T argh[], int index, int size);
 
+/**
+insertionSort
+
+Does what it says on the tin.
+*/
+template <typename T>
+void insertionSort(T data[], int index, int size);
+
 
 /**
 */
@@ -48,7 +56,7 @@ void Sort(T data[], int arrSize)
 	int runSize = arrSize;
 	reverseElem(data, begin, runSize);
 
-
+	insertionSort(data, begin, runSize);
 
 	/*
 	Step through array, and process.
@@ -101,15 +109,44 @@ void reverseElem(T argh[], int index, int size)
 {
 	//Starting from edges, swap inwards.
 	int end = index+size-1;
-	for(int i = 0; i < size/2; i++)
+	T temp;
+	int i ;
+	for(i = 0; i < size/2; i++)
 	{
-		T temp = argh[index+i];
+		temp = argh[index+i];
 		argh[index+i] = argh [end-i];
 		argh [end -i] = temp;
 	}
 
 };
 
+
+template <typename T>
+void insertionSort(T data[], int index, int size)
+{
+	//InsertionSort taken from 
+	//"Data Structures And Algorithms in C++ " by Adam Drozdek
+	// 9.1.1, page 336
+
+	int i , j;
+	T temp;
+
+	for(i =1; i < size; i++)
+	{
+		temp = data[i];
+		j = i;
+		while(j > 0 && temp < data[j-1])
+		{
+			data [j] = data[j-1];
+			j--;
+		}
+		data[j] = temp;
+
+	}
+	
+
+
+};
 
 /*
 template <typename T>
