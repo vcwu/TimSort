@@ -78,19 +78,15 @@ void Sort(T data[], int arrSize)
 	//Where we stores our runs.
 	stack< pair <int, int> >* cake;
 
-	int begin = 0;
+	int index1 = 0;
+	int size1 = 3;
+	int index2 = size1;
+	int size2= arrSize-size1;  
 	int runSize = arrSize;
-	reverseElem(data, begin, runSize);
+	//reverseElem(data, begin, runSize);
 
-	cout<< endl << "after reversing" << endl;
-	for( int i =0; i< arrSize;  i++)
-	{
-		
-		cout << data[i];
-		cout << " " ;
-	}
 
-	insertionSort(data, begin, 5);
+	insertionSort(data, index1, size1);
 	cout<< endl << "after insertion sort" << endl;
 	for( int i =0; i< arrSize;  i++)
 	{
@@ -98,7 +94,7 @@ void Sort(T data[], int arrSize)
 		cout << data[i];
 		cout << " " ;
 	}
-	insertionSort(data, 5, 5);
+	insertionSort(data, index2, size2);
 
 	cout<< endl << "after insertion sort" << endl;
 	for( int i =0; i< arrSize;  i++)
@@ -108,7 +104,7 @@ void Sort(T data[], int arrSize)
 		cout << " " ;
 	}
 
-	mergeDown(data, begin , 5, 5, 5);
+	mergeUp(data, index1 , size1, index2, size2);
 
 	cout<< endl << "after merging" << endl;
 	for( int i =0; i< arrSize;  i++)
@@ -252,14 +248,14 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 			data[i3+i] = data[i2+i];
 		}
 	}
+	
 	else
 		for(int i =0; i < size1-i1; i++)
 		{
 			data[i3+i] = arr1[i1+i];
 		}
-
-	delete [] arr1; 
-//	delete [] arr2;
+	
+	delete [] arr1;
 	
 }
 
@@ -285,30 +281,30 @@ void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
 	//Once we reach the end of an array...
 	while(i1 >= begin1 && i2 >= 0)
 	{
-		if(arr1[i1] > data[i2])
-			data[i3--] = arr1[i1--];
+		if(arr2[i2] > data[i1])
+			data[i3--] = arr2[i2--];
 		else
-			data[i3--] = data[i2--];
+			data[i3--] = data[i1--];
 	}
 
 	//Load the remaining stuff. 
-	if(i1 == size1)		//firstArray is allready in
+	if(i1 < begin1)		//firstArray is allready in
 	{	
 
 		//copy the contents of secondArray
-		for(int i = 0; i < i2-begin2; i++ )
+		for(int i  = i3; i2 >= begin2  ; i-- )
 		{
-			data[i3+i] = data[i2+i];
+			data[i] = arr2[i2--];
 		}
 	}
 	else
-		for(int i =0; i < size1-i1; i++)
+		for(int i = i3; i >= size1-i1; i--)
 		{
-			data[i3+i] = arr1[i1+i];
+			data[i3+i] = data[i1+i];
 		}
+		
+	delete [] arr2; 
 
-	delete [] arr1; 
-//	delete [] arr2;
 	
 }
 
