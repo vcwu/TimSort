@@ -41,13 +41,28 @@ void insertionSort(T data[], int index, int size);
 
 
 /**
-merge
+mergeDown
 
-Merges two chunks of the array together. 
+Merges two chunks of the array together by making a copy
+of the earlier chunk and merging into there starting from lo to hi.
+Ideally, done in place, and with gallop mode too.
+*/
+template <typename T>
+void mergeDown(T data[], int index1, int size1, int index2, int size2);
+
+
+/**
+mergeUp
+
+Merges two chunks of the array together by making a copy
+of the later chunk and merging into there starting from hi to lo.
+Basically, a bacwkwards merge.
 Ideally, done in place, and with gallop mode too.
 */
 template <typename T>
 void mergeUp(T data[], int index1, int size1, int index2, int size2);
+
+
 
 /**
 */
@@ -93,7 +108,7 @@ void Sort(T data[], int arrSize)
 		cout << " " ;
 	}
 
-	mergeUp(data, begin , 5, 5, 5);
+	mergeDown(data, begin , 5, 5, 5);
 
 	cout<< endl << "after merging" << endl;
 	for( int i =0; i< arrSize;  i++)
@@ -189,17 +204,14 @@ void insertionSort(T data[], int index, int size)
 		data[j] = temp;
 
 	}
-	
-
-
 };
 
 template <typename T>
-void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
+void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 {
 	//Naive merge base taken from 
 	//"Data Structures And Algorithms in C++ " by Adam Drozdek
-	// 9.3.4, page 364
+  	// 9.3.4, page 364
 
 	//Make two separate arrays, to make room to write 
 	//to original array.
@@ -246,13 +258,60 @@ void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
 			data[i3+i] = arr1[i1+i];
 		}
 
+	delete [] arr1; 
+//	delete [] arr2;
 	
+}
 
+template <typename T>
+void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
+{
+	//Naive merge base taken from 
+	//"Data Structures And Algorithms in C++ " by Adam Drozdek
+  	// 9.3.4, page 364
+
+	//Hmmm. should i use vector or not?
+	T* arr2  = new T[size2];
+
+	for(int i =begin2; i< begin2+size1; i++)
+	{
+		arr2[i-begin1] = data[i];
+	}
+
+	int i1 = begin1+size1 -1;//end index of first array
+	int i2 = size2 -1;	   	//index of second array
+	int i3 = begin2+size2 -1;//index we are inserting into
+
+	//Once we reach the end of an array...
+	while(i1 >= begin1 && i2 >= 0)
+	{
+		if(arr1[i1] > data[i2])
+			data[i3--] = arr1[i1--];
+		else
+			data[i3--] = data[i2--];
+	}
+
+	//Load the remaining stuff. 
+	if(i1 == size1)		//firstArray is allready in
+	{	
+
+		//copy the contents of secondArray
+		for(int i = 0; i < i2-begin2; i++ )
+		{
+			data[i3+i] = data[i2+i];
+		}
+	}
+	else
+		for(int i =0; i < size1-i1; i++)
+		{
+			data[i3+i] = arr1[i1+i];
+		}
 
 	delete [] arr1; 
 //	delete [] arr2;
 	
 }
+
 
 /*
 template <typename T>
