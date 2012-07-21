@@ -120,9 +120,7 @@ void Sort(T data[], int arrSize)
 	int runSize = arrSize;
 	//reverseElem(data, begin, runSize);
 
-	insertionSort(data, index1, size1);
-	insertionSort(data, index2, size2);
-
+	
 
 	/*
 	//Testing Mergify
@@ -204,14 +202,12 @@ void Sort(T data[], int arrSize)
 		
 		//making it easy. Chop up into minrun stuff, 
 		//put on the vector.
-		//insert(data, cake, index, minRun);
+		insertionSort(data, index, minRun);
+		insert(data, cake, index, minRun);
 		//cake->push_back(record(index, minRun));
 		index += minRun;
 	}
 	
-
-
-
 };
 
 int compute_minrun(int size)
@@ -421,18 +417,16 @@ void insert(T data[], vector<record>* cake, int begin, int size)
 		if(happy == 1)
 		{
 			if((*cake)[size-1].length > (*cake)[size-3].length)
-				mergify(data, (*cake)[size-3], (*cake)[size-2]);
+				 mergify(data, (*cake)[size-3], (*cake)[size-2]);
 			else
 				mergify(data, (*cake)[size-1], (*cake)[size-2]);
 		}
 		else
 		{
-			mergify(data, (*cake)[size-3], (*cake)[size-2]);
+			mergify(data, (*cake)[size-1], (*cake)[size-2]);
 		}
 		happy = happyStack(cake);
 	}
-
-
 }
 
 template <typename T>
