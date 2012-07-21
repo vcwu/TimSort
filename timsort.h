@@ -114,13 +114,40 @@ void Sort(T data[], int arrSize)
 	vector<record>* cake = new vector<record>;
 
 	int index1 = 0;
-	int size1 = 8;
+	int size1 = 10;
 	int index2 = size1;
 	int size2= arrSize-size1;  
 	int runSize = arrSize;
 	//reverseElem(data, begin, runSize);
 
+	insertionSort(data, index1, size1);
+	insertionSort(data, index2, size2);
+
+
 	/*
+	//Testing Mergify
+
+	cout << "Before mergify " << endl;
+	for( int i =0; i< arrSize;  i++)
+	{
+		
+		cout << data[i];
+		cout << " " ;
+	}
+
+	
+	//mergify(data, record(index2, size2), record(index1, size1));
+	mergify(data, record(index1, size1), record(index2, size2));
+	cout<< endl << endl << "after mergify " << endl;
+	for( int i =0; i< arrSize;  i++)
+	{	
+		cout << data[i];
+		cout << " " ;
+	}
+	*/
+
+	/*
+	//Testing Insertion sort, Merge up and down
 
 	insertionSort(data, index1, size1);
 	cout<< endl << "after insertion sort" << endl;
@@ -158,19 +185,6 @@ void Sort(T data[], int arrSize)
 	Step through array, and process.
 	*/
 
-	//Testing happyStack
-	for(int i =0; i< 10; i++)
-	{
-		//cake->push_back(record(0,i+10));
-	}
-
-	cake->push_back(record(10,90));
-	cake->push_back(record(0, 50));
-	cake->push_back(record(10,25));
-	cake->push_back(record(10,25));
-
-	cout << "Is the stack happy? " << happyStack(cake);
-	cout << endl;
 	
 	enum {NONE, UP, DOWN};
 	int minRun = compute_minrun(arrSize);
@@ -191,6 +205,7 @@ void Sort(T data[], int arrSize)
 		//making it easy. Chop up into minrun stuff, 
 		//put on the vector.
 		//insert(data, cake, index, minRun);
+		//cake->push_back(record(index, minRun));
 		index += minRun;
 	}
 	
@@ -432,13 +447,14 @@ void mergify(T data[], record r1, record r2)
 		if(r1.length <r2.length)
 			mergeDown(data, r1.index, r1.length, r2.index, r2.length);
 		else
-			mergeUp(data, r2.index, r2.length, r1.index, r1.length);
+			mergeUp(data, r1.index, r1.length, r2.index, r2.length);
 	}
 	else if(r2.index < r1.index)
 	{
 		if(r2.length <r1.length)
 			mergeDown(data, r2.index, r2.length, r1.index, r1.length);
 		else
-			mergeUp(data, r1.index, r1.length, r2.index, r2.length);
+			mergeUp(data, r2.index, r2.length, r1.index, r1.length);
 	}
+	
 }
