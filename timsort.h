@@ -12,7 +12,6 @@ order.
 */
 
 
-
 /*
 compute_minrun
 
@@ -63,12 +62,48 @@ template <typename T>
 void mergeUp(T data[], int index1, int size1, int index2, int size2);
 
 
+/**
+A record, keeping track of index and length. 
+Used in the merging stack to keep track of sorted runs.
+*/
+struct record
+{
+	int index, length;
+	record(int i, int l) : index(i), length(l) {}
+};
+
 
 /**
-*/
+mergify
 
+Takes two records and merges em. Uses mergeUp and mergeDown.
+*/
 template <typename T>
-void insert(stack< pair <int, int> >* cake, int begin, int size);
+void mergify(T data[], record r1, record r2);
+
+/**
+happyStack
+
+When the stack is not happy, it must be collapsed until it is happy.
+Ensures that we are merging together runs of roughly same size.
+The stack is only happy when
+1. Len(A) >= Len(B) + Len(C)
+2. Len(B) > Len (C)
+
+*/
+int happyStack(vector<record>* cake);
+
+
+/**
+Inserts a record onto the stack. 
+Automatically handles collapsing the stack.
+
+*/
+template <typename T>
+void insert(T data[], vector<record>* cake, int begin, int size);
+
+
+
 
 template <typename T>
 void Sort(T data[], int arrSize) 
@@ -76,15 +111,16 @@ void Sort(T data[], int arrSize)
 
 
 	//Where we stores our runs.
-	stack< pair <int, int> >* cake;
+	vector<record>* cake = new vector<record>;
 
 	int index1 = 0;
-	int size1 = 5;
+	int size1 = 8;
 	int index2 = size1;
 	int size2= arrSize-size1;  
 	int runSize = arrSize;
 	//reverseElem(data, begin, runSize);
 
+	/*
 
 	insertionSort(data, index1, size1);
 	cout<< endl << "after insertion sort" << endl;
@@ -115,11 +151,27 @@ void Sort(T data[], int arrSize)
 	}
 	cout << endl;
 
+	*/
+
+
 	/*
 	Step through array, and process.
 	*/
 
-	/*
+	//Testing happyStack
+	for(int i =0; i< 10; i++)
+	{
+		//cake->push_back(record(0,i+10));
+	}
+
+	cake->push_back(record(10,90));
+	cake->push_back(record(0, 50));
+	cake->push_back(record(10,25));
+	cake->push_back(record(10,25));
+
+	cout << "Is the stack happy? " << happyStack(cake);
+	cout << endl;
+	
 	enum {NONE, UP, DOWN};
 	int minRun = compute_minrun(arrSize);
 	int begin;			//Keep track of start of run
@@ -136,15 +188,12 @@ void Sort(T data[], int arrSize)
 	{
 		//let's go for a run! 		
 		
-		begin = index;
-							//find out if ascending or descending 
-		
-		while(   && (index < arrSize))
-		{
-
-		}
+		//making it easy. Chop up into minrun stuff, 
+		//put on the vector.
+		//insert(data, cake, index, minRun);
+		index += minRun;
 	}
-	*/
+	
 
 
 
@@ -157,6 +206,7 @@ int compute_minrun(int size)
 
 	if(size <64)
 		return size;
+
 	return 64;
 
 };
@@ -257,7 +307,7 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 	
 	delete [] arr1;
 	
-}
+};
 
 template <typename T>
 void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
@@ -308,12 +358,87 @@ void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
 	
 }
 
+int happyStack(vector<record>* cake)
+{
+	/*
+	Returns an int - 
+	0 if stack is happy,
+	1 if invariant 1 violated, 
+	2 if invariant 2 violated.
+	This way, won't have to re check which invariant is violated
+	in order to do an appropriate merge.
+	*/
+	
+	int size = cake->size();
 
-/*
+	//Sorting complete!
+	if (size == 1)
+		return 0;
+	else if (size == 2)
+	{
+		if( (*cake)[1].length >= (*cake)[0].length  )
+			return 2;
+	
+	}
+	else
+	{
+		if(!((*cake)[size-3].length >= 
+			(*cake)[size-2].length + (*cake)[size-1].length))
+			return 1;
+		else if(!((*cake)[size-2].length > (*cake)[size-1].length))
+			return 2;
+	}
+	return 0;
+}
+
 template <typename T>
-void insert(stack< pair <int, int> >* cake, int begin, int size)
+void insert(T data[], vector<record>* cake, int begin, int size)
 {
 	
-	cake->push(pair(begin, size));
-};
-*/
+	cake->push_back(record(begin, size));
+	
+	//Check the invariants. Collapse stack as long as needed.
+	int happy = happyStack(cake);
+	while(happy != 0)
+	{
+		//First invariant is violated. 
+		//B merges with shorter of A and C.
+		if(happy == 1)
+		{
+			if((*cake)[size-1].length > (*cake)[size-3].length)
+				mergify(data, (*cake)[size-3], (*cake)[size-2]);
+			else
+				mergify(data, (*cake)[size-1], (*cake)[size-2]);
+		}
+		else
+		{
+			mergify(data, (*cake)[size-3], (*cake)[size-2]);
+		}
+		happy = happyStack(cake);
+	}
+
+
+}
+
+template <typename T>
+void mergify(T data[], record r1, record r2)
+{
+	//Depending on whether the shorter run is earlier
+	// or later  we'll either merge UP or merge DOWN.
+
+	
+	if(r1.index < r2.index)
+	{
+		if(r1.length <r2.length)
+			mergeDown(data, r1.index, r1.length, r2.index, r2.length);
+		else
+			mergeUp(data, r2.index, r2.length, r1.index, r1.length);
+	}
+	else if(r2.index < r1.index)
+	{
+		if(r2.length <r1.length)
+			mergeDown(data, r2.index, r2.length, r1.index, r1.length);
+		else
+			mergeUp(data, r1.index, r1.length, r2.index, r2.length);
+	}
+}
