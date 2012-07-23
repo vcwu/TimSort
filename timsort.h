@@ -198,7 +198,7 @@ void Sort(T data[], int arrSize)
 	//Keep going as long as there is an ORDERING, or 
 	//haven't reached minRun size yet.
 	
-	while(index < arrSize)
+	while(index+minRun < arrSize)
 	{
 		//let's go for a run! 		
 		
@@ -209,13 +209,35 @@ void Sort(T data[], int arrSize)
 		//cake->push_back(record(index, minRun));
 		index += minRun;
 	}
+
+	insertionSort(data, index, arrSize - index);
+	insert(data, cake, index, arrSize - index);
 	
+	//Final merging to compress stack.
+	while(cake->size()!= 1)
+	{
+		record shiny;
+		record last = cake->back();
+		cake->pop_back();
+		record secLast = cake->back();
+		cake->pop_back();
+		shiny = mergify(data, last, secLast);
+		cake->push_back(shiny);
+
+	}
 };
 
 int compute_minrun(int size)
 {
 	//take first 6 bits, if any of other bits are set then
 	//adds one
+
+	int mySize = 5;
+
+	if(size < mySize)
+		return size;
+	else return mySize;
+
 
 	if(size <64)
 		return size;

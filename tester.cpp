@@ -1,4 +1,4 @@
-//#include "timsort.h"
+#include "timsort.h"
 #include <iostream>
 #include <fstream>
 
@@ -33,16 +33,35 @@ int main()
 	
 	*/
 
-	ifstream fin("C:\\Users\\vptarmigan\\Downloads\\runs\\random.txt");
-	//ifstream fin("random.txt");
-	const int size = 10;
+	ifstream fin("random.txt");
+	//ifstream fin("smallTest.txt");
+	const int size = 1000;
 	int hello[size];
 	int temp;
 	
 	int i=0;
 	 
 
+	for(int i =0; i < size; i++)
+	{
+		fin >> temp;
+		hello[i] = temp;
+	}
+
+	cout << "Before Sort" << endl << endl;
+
+	for( int i =0; i< size;  i++)
+	{
+		cout << hello[i];
+		cout << " " ;
+		if((i+1)%6 == 0)
+			cout << endl;
+	}
+
+	Sort(hello, size);
 	
+	cout << endl << "PRINTING HELLO " << endl << endl;
+
 	for( int i =0; i< size;  i++)
 	{
 		cout << hello[i];
@@ -52,21 +71,11 @@ int main()
 	}
 	
 
-	//Sort(hello, size);
-	
-	for( int i =0; i< size;  i++)
-	{
-		cout << hello[i];
-		cout << " " ;
-		if((i+1)%6 == 0)
-			cout << endl;
-	}
-	
-
-	fin.close();
+	//fin.close();
 
 
-	int hey;
-	cin >> hey;
+	int me;
+	cin >> me;
+
 	return 0;
 }
