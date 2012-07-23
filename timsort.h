@@ -69,7 +69,9 @@ Used in the merging stack to keep track of sorted runs.
 struct record
 {
 	int index, length;
-	record(int i, int l) : index(i), length(l) {}
+	record(int i = 0, int l= 0) : index(i), length(l) {}
+	
+
 };
 
 
@@ -79,7 +81,7 @@ mergify
 Takes two records and merges em. Uses mergeUp and mergeDown.
 */
 template <typename T>
-void mergify(T data[], record r1, record r2);
+record mergify(T data[], record r1, record r2);
 
 /**
 happyStack
@@ -175,7 +177,7 @@ void Sort(T data[], int arrSize)
 		cout << " " ;
 	}
 	cout << endl;
-
+	 
 	*/
 
 
@@ -238,7 +240,7 @@ void reverseElem(T argh[], int index, int size)
 
 };
 
-
+ 
 template <typename T>
 void insertionSort(T data[], int index, int size)
 {
@@ -389,7 +391,8 @@ int happyStack(vector<record>* cake)
 	{
 		if( (*cake)[1].length >= (*cake)[0].length  )
 			return 2;
-	
+		else
+			return 0;
 	}
 	else
 	{
@@ -398,8 +401,10 @@ int happyStack(vector<record>* cake)
 			return 1;
 		else if(!((*cake)[size-2].length > (*cake)[size-1].length))
 			return 2;
+		else
+			return 0;
 	}
-	return 0;
+	
 }
 
 template <typename T>
@@ -412,32 +417,58 @@ void insert(T data[], vector<record>* cake, int begin, int size)
 	int happy = happyStack(cake);
 	while(happy != 0)
 	{
+		int cakeSize = cake->size();
+		// A B C <== top of stack
+		record c((*cake)[cakeSize-1]);
+		record b((*cake)[cakeSize-2]);
+		
+		record shiny;
 		//First invariant is violated. 
 		//B merges with shorter of A and C.
 		if(happy == 1)
 		{
-			if((*cake)[size-1].length > (*cake)[size-3].length)
-				 mergify(data, (*cake)[size-3], (*cake)[size-2]);
+			record a((*cake)[cakeSize-3]);
+			cake->pop_back();
+			cake->pop_back();
+			if(c.length > a.length)
+			{
+				cake->pop_back();
+				shiny = mergify(data, a, b);	
+				//now to fill cake back up, with shiny replacing
+				//a and b
+				cake->push_back(shiny);
+				cake->push_back(c);
+			}
 			else
-				mergify(data, (*cake)[size-1], (*cake)[size-2]);
+			{
+				shiny = mergify(data, c, b);
+				cake->push_back(shiny);
+			}
 		}
 		else
 		{
-			mergify(data, (*cake)[size-1], (*cake)[size-2]);
+			cake->pop_back();
+			cake->pop_back();
+			shiny = mergify(data, c, b);
+			cake->push_back(shiny);
 		}
 		happy = happyStack(cake);
+		cout << "Checking happiness..." << endl;
 	}
 }
 
 template <typename T>
-void mergify(T data[], record r1, record r2)
+record mergify(T data[], record r1, record r2)
 {
 	//Depending on whether the shorter run is earlier
 	// or later  we'll either merge UP or merge DOWN.
 
-	
+	record ans;
+	ans.length = r1.length + r2.length;
+
 	if(r1.index < r2.index)
 	{
+		ans.index = r1.index;
 		if(r1.length <r2.length)
 			mergeDown(data, r1.index, r1.length, r2.index, r2.length);
 		else
@@ -445,10 +476,12 @@ void mergify(T data[], record r1, record r2)
 	}
 	else if(r2.index < r1.index)
 	{
+		ans.index = r2.index;
 		if(r2.length <r1.length)
 			mergeDown(data, r2.index, r2.length, r1.index, r1.length);
 		else
 			mergeUp(data, r2.index, r2.length, r1.index, r1.length);
 	}
 	
+	return ans;
 }
