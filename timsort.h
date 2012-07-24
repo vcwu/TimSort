@@ -190,7 +190,7 @@ void Sort(T data[], int arrSize)
 	int minRun = compute_minrun(arrSize);
 	int begin = 0;			//Keep track of start of run
 	int index = 0;		//Stepping through the array
-	int size =0 ;		//Size of the current run
+	int size =1 ;		//Size of the current run
 	int order = START;
 	bool maybe = true;	//Dont' know if it is a run yet...
 
@@ -225,14 +225,18 @@ void Sort(T data[], int arrSize)
 				maybe = false;
 		}
 
+		cout << "ID Run " << endl;
+		cout << "index " << index << " size " << size << endl;
+
 		//if there's a run bigger than minrun...
 		if(size > minRun)
 		{	
 			if(order == DEC)
 			{
-				reverseElem(data, index, size);
+				reverseElem(data, begin, size);
 			}
-			insert(data, cake, index, size);
+			insert(data, cake, begin, size);
+			begin = begin + size;
 		}
 		//Nope. No minrun.. 
 		else
@@ -240,14 +244,16 @@ void Sort(T data[], int arrSize)
 			insertionSort(data, begin, minRun);
 			insert(data, cake, begin, minRun);
 			index += minRun;
+			begin += minRun;
 		}
 
-		size = 0;
+		size = 1;
 		order = START;
+		maybe = true;
 	}
 
-	insertionSort(data, index, arrSize - index);
-	insert(data, cake, index, arrSize - index);
+	insertionSort(data, begin, arrSize - begin);
+	insert(data, cake, begin, arrSize - begin);
 	
 	//Final merging to compress stack.
 	while(cake->size()!= 1)
@@ -477,7 +483,8 @@ int happyStack(vector<record>* cake)
 template <typename T>
 void insert(T data[], vector<record>* cake, int begin, int size)
 {
-	
+
+
 	cake->push_back(record(begin, size));
 	
 	//Check the invariants. Collapse stack as long as needed.
@@ -520,8 +527,14 @@ void insert(T data[], vector<record>* cake, int begin, int size)
 			cake->push_back(shiny);
 		}
 		happy = happyStack(cake);
-		cout << "Checking happiness..." << endl;
 	}
+	cout << endl << "RECORD STACK after insertion" << endl;
+	for(auto i = cake->begin(); i != cake->end(); ++i)
+	{
+		cout << "Index: " << i->index
+			<< " Length: " << i->length << endl;
+	}
+	cout << endl;
 }
 
 template <typename T>

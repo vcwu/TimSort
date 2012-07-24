@@ -33,9 +33,10 @@ int main()
 	
 	*/
 
-	//ifstream fin("random.txt");
-	ifstream fin("smallTest.txt");
-	const int size = 32;
+	ifstream fin("random.txt");
+	//ifstream fin("smallTest.txt");
+	const int size = 100;
+	//const int size = 10;
 	int hello[size];
 	int temp;
 	
@@ -48,6 +49,8 @@ int main()
 		hello[i] = temp;
 	}
 
+
+	/*
 	cout << "Before Sort" << endl << endl;
 
 	for( int i =0; i< size;  i++)
@@ -57,6 +60,7 @@ int main()
 		if((i+1)%6 == 0)
 			cout << endl;
 	}
+	*/
 
 	Sort(hello, size);
 	
