@@ -3,6 +3,9 @@
 #include <stack>
 #include <utility>
 using namespace std;
+
+#define DEBUG false
+
 /*
 PRE: Array 'data' is full in at least the first ArrSize 
 locations (0 to ArrSize-1, as usual). The data type is comparable, 
@@ -203,9 +206,10 @@ void Sort(T data[], int arrSize)
 	{
 		
 		//One run. 
+		if(DEBUG)
+			cout << endl << "Run Start" << endl;
 
-
-		while(maybe)
+		while(maybe && index < arrSize-1)
 		{
 
 			if(data[index] > data[index+1]  && (order == START || order == DEC))
@@ -225,9 +229,11 @@ void Sort(T data[], int arrSize)
 				maybe = false;
 		}
 
-		cout << "ID Run " << endl;
-		cout << "index " << index << " size " << size << endl;
-
+		if(DEBUG)
+		{
+			cout <<endl << "ID Run " << endl;
+			cout << "index " << index << " size " << size << endl;
+		}
 		//if there's a run bigger than minrun...
 		if(size > minRun)
 		{	
@@ -237,14 +243,15 @@ void Sort(T data[], int arrSize)
 			}
 			insert(data, cake, begin, size);
 			begin = begin + size;
+			index = begin;
 		}
 		//Nope. No minrun.. 
 		else
 		{
 			insertionSort(data, begin, minRun);
 			insert(data, cake, begin, minRun);
-			index += minRun;
 			begin += minRun;
+			index = begin;
 		}
 
 		size = 1;
@@ -252,9 +259,11 @@ void Sort(T data[], int arrSize)
 		maybe = true;
 	}
 
-	insertionSort(data, begin, arrSize - begin);
-	insert(data, cake, begin, arrSize - begin);
-	
+	if(begin < arrSize)
+	{
+		insertionSort(data, begin, arrSize - begin);
+		insert(data, cake, begin, arrSize - begin);
+	}
 	//Final merging to compress stack.
 	while(cake->size()!= 1)
 	{
@@ -265,8 +274,20 @@ void Sort(T data[], int arrSize)
 		cake->pop_back();
 		shiny = mergify(data, last, secLast);
 		cake->push_back(shiny);
-
+		if(DEBUG)
+		{
+			cout << endl << "Compressing " << endl;
+			for(auto i = cake->begin(); i != cake->end(); ++i)
+			{
+				cout << "Index: " << i->index
+					<< " Length: " << i->length << endl;
+			}
+			cout << endl;
+	
+		}
 	}
+
+
 };
 
 int compute_minrun(int size)
@@ -563,5 +584,16 @@ record mergify(T data[], record r1, record r2)
 			mergeUp(data, r2.index, r2.length, r1.index, r1.length);
 	}
 	
+	if(DEBUG)
+	{
+		//Let's see the result of our mergify!
+		cout << endl << "Mergify Results"<< endl;
+		for(int i =ans.index; i< ans.length; i++)
+		{
+			cout << data[i] << " ";
+			if((i+1)%6 == 0)
+				cout << endl;
+		}
+	}
 	return ans;
 }
