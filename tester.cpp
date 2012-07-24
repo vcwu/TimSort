@@ -33,9 +33,9 @@ int main()
 	
 	*/
 
-	ifstream fin("random.txt");
-	//ifstream fin("smallTest.txt");
-	const int size = 1000;
+	//ifstream fin("random.txt");
+	ifstream fin("smallTest.txt");
+	const int size = 32;
 	int hello[size];
 	int temp;
 	

@@ -186,13 +186,14 @@ void Sort(T data[], int arrSize)
 	*/
 
 	
-	enum {NONE, UP, DOWN};
+	enum {START, NONE, INC, DEC};
 	int minRun = compute_minrun(arrSize);
-	int begin;			//Keep track of start of run
+	int begin = 0;			//Keep track of start of run
 	int index = 0;		//Stepping through the array
 	int size =0 ;		//Size of the current run
-	int order = NONE;
-	
+	int order = START;
+	bool maybe = true;	//Dont' know if it is a run yet...
+
 	
 	//Don't run off edge of array.
 	//Keep going as long as there is an ORDERING, or 
@@ -200,14 +201,49 @@ void Sort(T data[], int arrSize)
 	
 	while(index+minRun < arrSize)
 	{
-		//let's go for a run! 		
 		
-		//making it easy. Chop up into minrun stuff, 
-		//put on the vector.
-		insertionSort(data, index, minRun);
-		insert(data, cake, index, minRun);
-		//cake->push_back(record(index, minRun));
-		index += minRun;
+		//One run. 
+
+
+		while(maybe)
+		{
+
+			if(data[index] > data[index+1]  && (order == START || order == DEC))
+			{
+				order = DEC;
+				++index;
+				++size;
+			}
+			else if(data[index] <= data[index+1] && (order == START || order == INC))
+			{
+				order = INC;
+				++size;
+				++index;
+			}
+			else 
+				//End of the inc/decreasing bit.
+				maybe = false;
+		}
+
+		//if there's a run bigger than minrun...
+		if(size > minRun)
+		{	
+			if(order == DEC)
+			{
+				reverseElem(data, index, size);
+			}
+			insert(data, cake, index, size);
+		}
+		//Nope. No minrun.. 
+		else
+		{
+			insertionSort(data, begin, minRun);
+			insert(data, cake, begin, minRun);
+			index += minRun;
+		}
+
+		size = 0;
+		order = START;
 	}
 
 	insertionSort(data, index, arrSize - index);
@@ -314,11 +350,20 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 	int i2 = begin2;	//index of second array
 	int i3 = begin1;	//index we are inserting into
 
+	const int MIN_GALLOP = 7;
+
+	bool arrWin = true;
+	int winning = 0;
+
 	//Once we reach the end of an array...
 	while(i1 < size1 && i2 < begin2+size2)
 	{
 		if(arr1[i1] < data[i2])
+		{
 			data[i3++] = arr1[i1++];
+			if(arrWin)
+				++winning;
+		}
 		else
 			data[i3++] = data[i2++];
 	}
