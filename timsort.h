@@ -4,7 +4,7 @@
 #include <utility>
 using namespace std;
 
-#define DEBUG false
+#define DEBUG true
 
 /*
 PRE: Array 'data' is full in at least the first ArrSize 
@@ -107,7 +107,13 @@ Automatically handles collapsing the stack.
 template <typename T>
 void insert(T data[], vector<record>* cake, int begin, int size);
 
+/**
+gallopRight
 
+Gallop to find the index of where target would go in the array.
+*/
+template <typename T>
+int gallopRight(T arr[], int size, int start, T target);
 
 
 template <typename T>
@@ -241,9 +247,23 @@ void Sort(T data[], int arrSize)
 			{
 				reverseElem(data, begin, size);
 			}
+
+			if(DEBUG)
+			{
+				cout << endl<< "INC RUN FOUND" << endl;
+			
+				for(int i =0; i< size; i++)
+				{
+					cout << data[begin+i] << " " ;
+					if(i+1 % 6 == 0)
+						cout <<endl;
+				}
+
+			}
 			insert(data, cake, begin, size);
 			begin = begin + size;
 			index = begin;
+		
 		}
 		//Nope. No minrun.. 
 		else
@@ -350,6 +370,14 @@ void insertionSort(T data[], int index, int size)
 	}
 };
 
+
+template <typename T>
+int gallopRight(T arr[], int size, int start, T target)
+{
+	return 0;
+}
+
+
 template <typename T>
 void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 {
@@ -379,20 +407,102 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 
 	const int MIN_GALLOP = 7;
 
-	bool arrWin = true;
+	enum {START, ONE, TWO};
+	int arrWin = START;
 	int winning = 0;
 
 	//Once we reach the end of an array...
+
+
+	
 	while(i1 < size1 && i2 < begin2+size2)
 	{
 		if(arr1[i1] < data[i2])
 		{
 			data[i3++] = arr1[i1++];
-			if(arrWin)
+
+			if( arrWin == START || arrWin == ONE)
 				++winning;
+			else
+				winning = 0;
 		}
 		else
+		{
 			data[i3++] = data[i2++];
+			if( arrWin == START || arrWin == TWO)
+				++winning;
+			else 
+				winning =0;
+		}
+
+		
+		
+		//Can we start galloping?
+		if(winning > MIN_GALLOP)
+		{
+			//Continue in Gallop until we fail twice in a row. 	
+			int failCount = 0;
+			while(failCount < 2)
+			{
+				int targetIndex; 
+				int endIndex;
+				
+				if(arrWin == ONE)
+				{
+					//Find indicies of slice to copy over.
+					//Also update indicies for next gallop.
+					int findMe = data[i2++];
+					endIndex = 
+						gallopRight(arr1, size1, i1, findMe);
+					i1 = endIndex+1;
+					arrWin = TWO;
+
+					int sliceSize = endIndex - i1 +1;
+
+					//Copy contents of slice directly into mergespace, 
+					//then target. 
+					for(int i =0; i < sliceSize; i++)
+					{
+						data[i3++] = arr1[i1+i];
+					}
+					data[i3++] = findMe;
+
+					//Do we continue galloping?
+					if(sliceSize < MIN_GALLOP)
+						failCount ++;
+					else
+						failCount = 0;
+				}
+				else	//Slicing from array2...
+				{
+					//Find indicies of slice to copy over.
+					//Also update indicies for next gallop.
+					int findMe = data[i1++];
+					endIndex = 
+						gallopRight(data, size2, i2, findMe);
+					i1 = endIndex+1;
+					arrWin = TWO;
+
+					int sliceSize = endIndex - i2 +1;
+
+					//Copy contents of slice directly into mergespace, 
+					//then target. 
+					for(int i =0; i < sliceSize; i++)
+					{
+						data[i3++] = arr1[i1+i];
+					}
+					data[i3++] = findMe;
+
+					//Do we continue galloping?
+					if(sliceSize < MIN_GALLOP)
+						failCount ++;
+					else
+						failCount = 0;
+				}
+			}
+			
+		}
+		//**/
 	}
 
 	//Load the remaining stuff. 
@@ -410,7 +520,7 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 		for(int i =0; i < size1-i1; i++)
 		{
 			data[i3+i] = arr1[i1+i];
-		}
+		}	
 	
 	delete [] arr1;
 	
@@ -549,13 +659,17 @@ void insert(T data[], vector<record>* cake, int begin, int size)
 		}
 		happy = happyStack(cake);
 	}
-	cout << endl << "RECORD STACK after insertion" << endl;
-	for(auto i = cake->begin(); i != cake->end(); ++i)
+
+	if(DEBUG)
 	{
-		cout << "Index: " << i->index
-			<< " Length: " << i->length << endl;
+		cout << endl << "RECORD STACK after insertion" << endl;
+		for(auto i = cake->begin(); i != cake->end(); ++i)
+		{
+			cout << "Index: " << i->index
+				<< " Length: " << i->length << endl;
+		}
+		cout << endl;
 	}
-	cout << endl;
 }
 
 template <typename T>
@@ -588,12 +702,14 @@ record mergify(T data[], record r1, record r2)
 	{
 		//Let's see the result of our mergify!
 		cout << endl << "Mergify Results"<< endl;
+		/*
 		for(int i =ans.index; i< ans.length; i++)
 		{
 			cout << data[i] << " ";
 			if((i+1)%6 == 0)
 				cout << endl;
 		}
+		*/
 	}
 	return ans;
 }

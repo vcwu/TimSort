@@ -33,9 +33,9 @@ int main()
 	
 	*/
 
-	ifstream fin("runs.txt");
-	//ifstream fin("smallTest.txt");
-	const int size = 10000;
+	//ifstream fin("runs.txt");
+	ifstream fin("smallTest.txt");
+	const int size = 20;
 	//const int size = 10;
 	int hello[size];
 	int temp;
@@ -50,7 +50,7 @@ int main()
 	}
 
 
-	/*
+	
 	cout << "Before Sort" << endl << endl;
 
 	for( int i =0; i< size;  i++)
@@ -60,13 +60,15 @@ int main()
 		if((i+1)%6 == 0)
 			cout << endl;
 	}
-	*/
+	
 
 	Sort(hello, size);
 	
-	cout << endl << "PRINTING HELLO " << endl << endl;
+	
+	cout << endl 
+	<< "PRINTING HELLO " << endl << endl;
 
-	for( int i =0; i< size/10;  i++)
+	for( int i =0; i< size;  i++)
 	{
 		cout << hello[i];
 		cout << " " ;
