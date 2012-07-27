@@ -4,7 +4,8 @@
 #include <utility>
 using namespace std;
 
-#define DEBUG true
+
+#define DEBUG false
 
 /*
 PRE: Array 'data' is full in at least the first ArrSize 
@@ -73,7 +74,11 @@ struct record
 {
 	int index, length;
 	record(int i = 0, int l= 0) : index(i), length(l) {}
-	
+	friend ostream&  operator<<(ostream &out, const record & r)
+	{
+		out << "Index: " << r.index << " Length: "  << r.length << endl;
+		return out;
+	}
 
 };
 
@@ -111,9 +116,15 @@ void insert(T data[], vector<record>* cake, int begin, int size);
 gallopRight
 
 Gallop to find the index of where target would go in the array.
+upperIndex - the upperbound index, non inclusive. 
+bool first - Depending on if the array came first, in order to maintain stability,
+	will return before or after duplicates
+
+Returns the index of the last element that should be sliced before
+inserting target.
 */
 template <typename T>
-int gallopRight(T arr[], int size, int start, T target);
+int gallopRight(T arr[], int upperIndex, int start, T target, bool earlier);
 
 
 template <typename T>
@@ -125,7 +136,7 @@ void Sort(T data[], int arrSize)
 	vector<record>* cake = new vector<record>;
 
 	int index1 = 0;
-	int size1 = 10;
+	int size1 = arrSize/2;
 	int index2 = size1;
 	int size2= arrSize-size1;  
 	int runSize = arrSize;
@@ -186,8 +197,40 @@ void Sort(T data[], int arrSize)
 		cout << " " ;
 	}
 	cout << endl;
-	 
-	*/
+	//**/ 
+
+
+
+	//Testing GallopRight
+	int find = 12;
+	insertionSort(data, index1, arrSize);
+	int insertHere = gallopRight(data, arrSize, 0, find, true );
+	cout << "insert at index " << insertHere;
+	cout << endl << endl << "If array came earlier.. ";
+	cout << endl << "Testing GallopRight, after duplicates" << endl;
+	cout << "Slice from 0 to " << insertHere << endl;
+	cout << "Then insert " << find << endl;
+	for (int i =0 ; i < arrSize; i++)
+	{
+		cout << data[i] << " ";
+		if(i == insertHere)
+			cout << " & "; 
+	}
+
+	insertHere = gallopRight(data, arrSize, 0, find, false ); 
+	cout << endl << endl  << "If array came later.. " ;
+	cout << endl << "Testing GallopRight, before duplicates" << endl;
+	cout << "Slice from 0 to " << insertHere << endl;
+	cout << "Then insert " << find << endl;
+	for (int i =0 ; i < arrSize; i++)
+	{
+		cout << data[i] << " ";
+		if(i == insertHere)
+			cout << " & "; 
+	}	
+	//**/
+
+
 
 
 	/*
@@ -207,6 +250,7 @@ void Sort(T data[], int arrSize)
 	//Don't run off edge of array.
 	//Keep going as long as there is an ORDERING, or 
 	//haven't reached minRun size yet.
+	
 	
 	while(index+minRun < arrSize)
 	{
@@ -301,8 +345,7 @@ void Sort(T data[], int arrSize)
 			cout << endl << "Compressing " << endl;
 			for(auto i = cake->begin(); i != cake->end(); ++i)
 			{
-				cout << "Index: " << i->index
-					<< " Length: " << i->length << endl;
+				cout << *i;
 			}
 			cout << endl;
 	
@@ -374,12 +417,9 @@ void insertionSort(T data[], int index, int size)
 
 
 template <typename T>
-int gallopRight(T arr[], int upperIndex, int start, T target)
+int gallopRight(T arr[], int upperIndex, int start, T target, bool earlier)
 {
 	//Search for target in the array by using binary search.
-	//Search K(n) = 2K(n-1) +1 places past the start index.
-	//Binary search within the interval to finally find the 
-	//index of the element where target should go.
 
 	int skip = 1;
 	int upper = start + 1;
@@ -399,7 +439,19 @@ int gallopRight(T arr[], int upperIndex, int start, T target)
 	//Binary search within the interval, inclusive. 
 	//Code taken from Data Structures and Algorithms in C++
 	// by Adam Drozdek
-	int lo = 0, mid, hi = upper;
+
+	/*
+	If target is 7, 
+
+	^ 7 7 7		returns before if array came later and target
+				needs to be inserted first, before the slice
+	
+	7 7 7 ^		returns AFTEr if array is earlier and target
+				needs to be inserted after the slice
+	*/
+	
+	int lo = lower, mid, hi = upper;
+	int atDuplicates;
 	while( lo <= hi)
 	{
 		mid = (lo + hi)/2;
@@ -407,11 +459,29 @@ int gallopRight(T arr[], int upperIndex, int start, T target)
 			hi = mid - 1;
 		else if (arr[mid] < target)
 			lo = mid + 1;
-		else //found target?
-			return 0;
+		else //found target
+		{
+			atDuplicates = mid;
+			break;	
+		}
 	}
 
-	return 0;
+	atDuplicates = mid;
+
+	if(!earlier)
+		
+		return atDuplicates -1;
+	else
+	{
+		//Need to return the index of the last duplicates, if any.
+		int afterDuplicates = atDuplicates;
+		while(afterDuplicates <=  upperIndex && 
+			arr[afterDuplicates] == target)	//Don't want to search past bound
+		{
+			++afterDuplicates;
+		}	
+		return afterDuplicates -1;
+	}
 }
 
 
@@ -424,19 +494,12 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 
 	//Make two separate arrays, to make room to write 
 	//to original array.
-
-	//Obviously, this is NOT going to work well for 
-	//a lot of elements. I'll implement the inplace sort later..
-
 	T* arr1  = new T[size1];
 
 	for(int i =begin1; i< begin1+size1; i++)
 	{
 		arr1[i-begin1] = data[i];
 	}
-	
-
-	//T* arr2 = new T[size2];
 
 	int i1 = 0;			//index of first array
 	int i2 = begin2;	//index of second array
@@ -450,9 +513,6 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 
 
 	//Once we reach the end of an array...
-
-
-	
 	while(i1 < size1 && i2 < begin2+size2)
 	{
 		if(arr1[i1] > data[i2])
@@ -471,11 +531,8 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 				++winning;
 			else
 				winning = 0;
-
 		}
 
-		
-		
 		//Can we start galloping?
 		if(false)
 		//if(winning > MIN_GALLOP)
@@ -497,17 +554,17 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 					//Also update indicies for next gallop.
 					int findMe = data[i2++];
 					endIndex = 
-						gallopRight(arr1, size1, i1, findMe);
+						gallopRight(arr1, size1, i1, findMe, true);
 					i1 = endIndex+1;
 					arrWin = TWO;
 
-					int sliceSize = endIndex - i1 +1;
-
 					//Copy contents of slice directly into mergespace, 
-					//then target. 
-					for(int i =0; i < sliceSize; i++)
+					//then target.
+					int sliceSize = 0;
+					for(int i =i1; i <= endIndex; i++)
 					{
-						data[i3++] = arr1[i1+i];
+						data[i3++] = arr1[i];
+						sliceSize++;
 					}
 					data[i3++] = findMe;
 
@@ -521,19 +578,19 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 				{
 					//Find indicies of slice to copy over.
 					//Also update indicies for next gallop.
-					int findMe = data[i1++];
+					int findMe = arr1[i1++];
 					endIndex = 
-						gallopRight(data, begin2 + size2, i2, findMe);
+						gallopRight(data, begin2 + size2, i2, findMe, false);
 					i1 = endIndex+1;
 					arrWin = TWO;
 
-					int sliceSize = endIndex - i2 +1;
-
 					//Copy contents of slice directly into mergespace, 
 					//then target. 
-					for(int i =0; i < sliceSize; i++)
+					int sliceSize = 0;
+					for(int i = i2; i <= endIndex; i++)
 					{
-						data[i3++] = arr1[i1+i];
+						data[i3++] = data[i];
+						sliceSize++;
 					}
 					data[i3++] = findMe;
 
@@ -544,6 +601,9 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 						failCount = 0;
 				}
 			}
+
+			if(DEBUG)
+				cout << "Exiting gallop " << endl;
 			
 		}
 		//Exiting galloping mode.
@@ -760,6 +820,10 @@ record mergify(T data[], record r1, record r2)
 	{
 		//Let's see the result of our mergify!
 		cout << endl << "Mergify Results"<< endl;
+
+		cout << "R1: " << r1  
+			<< "R2: " << r2 
+			<< "Merge -> " << ans << endl;
 		/*
 		for(int i =ans.index; i< ans.length; i++)
 		{
