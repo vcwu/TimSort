@@ -35,7 +35,7 @@ int main()
 
 	//ifstream fin("runs.txt");
 	ifstream fin("smallTest.txt");
-	const int size = 20;
+	const int size = 29;
 	//const int size = 10;
 	int hello[size];
 	int temp;

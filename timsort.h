@@ -372,9 +372,44 @@ void insertionSort(T data[], int index, int size)
 
 
 template <typename T>
-int gallopRight(T arr[], int size, int start, T target)
+int gallopRight(T arr[], int upperIndex, int start, T target)
 {
-	return 0;
+	//Search for target in the array by using binary search.
+	//Search K(n) = 2K(n-1) +1 places past the start index.
+	//Binary search within the interval to finally find the 
+	//index of the element where target should go.
+
+	int skip = 1;
+	int upper = start + 1;
+	int lower = start;
+
+	//Don't want to jump past edge.
+	while(upper < upperIndex && arr[upper] < target)
+	{
+		skip = 2*skip +1;	//skips in 1,3,7, etc
+		lower = upper;
+		upper += skip;
+	}
+
+	if(upper > upperIndex)
+		upper = upperIndex - 1;
+
+	//Binary search within the interval, inclusive. 
+	//Code taken from Data Structures and Algorithms in C++
+	// by Adam Drozdek
+	int lo = 0, mid, hi = upper;
+	while( lo <= hi)
+	{
+		mid = (lo + hi)/2;
+		if( target < arr[mid] )
+			hi = mid - 1;
+		else if (arr[mid] < target)
+			lo = mid + 1;
+		else //found target?
+
+	}
+
+
 }
 
 
@@ -411,28 +446,30 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 	int arrWin = START;
 	int winning = 0;
 
+
 	//Once we reach the end of an array...
 
 
 	
 	while(i1 < size1 && i2 < begin2+size2)
 	{
-		if(arr1[i1] < data[i2])
-		{
-			data[i3++] = arr1[i1++];
-
-			if( arrWin == START || arrWin == ONE)
-				++winning;
-			else
-				winning = 0;
-		}
-		else
+		if(arr1[i1] > data[i2])
 		{
 			data[i3++] = data[i2++];
 			if( arrWin == START || arrWin == TWO)
 				++winning;
 			else 
 				winning =0;
+		}
+		else //Since arr1 comes earlier in original array,
+			//arr1 gets copied in if arr1 and data are equal. 
+		{
+			data[i3++] = arr1[i1++];
+			if( arrWin == START || arrWin == ONE)
+				++winning;
+			else
+				winning = 0;
+
 		}
 
 		
@@ -441,6 +478,10 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 		if(winning > MIN_GALLOP)
 		{
 			//Continue in Gallop until we fail twice in a row. 	
+			if(DEBUG)
+			{
+				cout << endl << "ENTERING GALLOP! " << endl;
+			}
 			int failCount = 0;
 			while(failCount < 2)
 			{
@@ -479,7 +520,7 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 					//Also update indicies for next gallop.
 					int findMe = data[i1++];
 					endIndex = 
-						gallopRight(data, size2, i2, findMe);
+						gallopRight(data, begin2 + size2, i2, findMe);
 					i1 = endIndex+1;
 					arrWin = TWO;
 
@@ -502,6 +543,7 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 			}
 			
 		}
+		//Exiting galloping mode.
 		//**/
 	}
 
@@ -548,10 +590,12 @@ void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
 	//Once we reach the end of an array...
 	while(i1 >= begin1 && i2 >= 0)
 	{
-		if(arr2[i2] > data[i1])
-			data[i3--] = arr2[i2--];
-		else
-			data[i3--] = data[i1--];
+		if(arr2[i2] < data[i1])
+			data[i3--] = data[i1--];	
+		else //if they are equal, arr2 will be copied first
+			//to maintain stability
+			data[i3--] = arr2[i2--];	
+		
 	}
 
 	//Load the remaining stuff. 
