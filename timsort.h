@@ -213,7 +213,7 @@ void Sort(T data[], int arrSize)
 		
 		//One run. 
 		if(DEBUG)
-			cout << endl << "Run Start" << endl;
+			cout << endl  << endl << "Run Start" << endl;
 
 		while(maybe && index < arrSize-1)
 		{
@@ -245,20 +245,14 @@ void Sort(T data[], int arrSize)
 		{	
 			if(order == DEC)
 			{
+				if(DEBUG)
+					cout << endl << "Reversing the decreasing run" << endl;
 				reverseElem(data, begin, size);
 			}
 
 			if(DEBUG)
 			{
-				cout << endl<< "INC RUN FOUND" << endl;
-			
-				for(int i =0; i< size; i++)
-				{
-					cout << data[begin+i] << " " ;
-					if(i+1 % 6 == 0)
-						cout <<endl;
-				}
-
+				cout << endl<< "RUN FOUND" << endl;
 			}
 			insert(data, cake, begin, size);
 			begin = begin + size;
@@ -268,12 +262,20 @@ void Sort(T data[], int arrSize)
 		//Nope. No minrun.. 
 		else
 		{
+			if(DEBUG)
+				cout << endl << "No run, inserting minRun " << endl;
 			insertionSort(data, begin, minRun);
 			insert(data, cake, begin, minRun);
 			begin += minRun;
 			index = begin;
 		}
 
+		if(DEBUG)
+		{
+
+
+			cout << endl << "------------------------------------" << endl;
+		}
 		size = 1;
 		order = START;
 		maybe = true;
@@ -406,10 +408,10 @@ int gallopRight(T arr[], int upperIndex, int start, T target)
 		else if (arr[mid] < target)
 			lo = mid + 1;
 		else //found target?
-
+			return 0;
 	}
 
-
+	return 0;
 }
 
 
@@ -475,7 +477,8 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 		
 		
 		//Can we start galloping?
-		if(winning > MIN_GALLOP)
+		if(false)
+		//if(winning > MIN_GALLOP)
 		{
 			//Continue in Gallop until we fail twice in a row. 	
 			if(DEBUG)
@@ -659,6 +662,17 @@ template <typename T>
 void insert(T data[], vector<record>* cake, int begin, int size)
 {
 
+	if(DEBUG)
+	{	
+		cout << endl << "PUTTING ON STACK" << endl;
+		for(int i =0; i< size; i++)
+		{
+			cout << data[begin+i] << " " ;
+			if(i+1 % 6 == 0)
+				cout <<endl;
+		}
+		cout << endl;
+	}
 
 	cake->push_back(record(begin, size));
 	
