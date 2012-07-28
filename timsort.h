@@ -1,12 +1,21 @@
+/*
+Victoria Wu 
+CS 352
+Summer '12
+
+Implement Timsort.
+*/
+
 #include <iostream>
 #include <vector>
 #include <stack>
 #include <utility>
+#include <assert.h>
 using namespace std;
 
 #define MIN_GALLOP 7
-#define DEBUG true
-#define GALLOP_DEBUG true
+#define DEBUG false
+#define GALLOP_DEBUG false
 
 /*
 PRE: Array 'data' is full in at least the first ArrSize 
@@ -158,123 +167,74 @@ void Sort(T data[], int arrSize)
 	//reverseElem(data, begin, runSize);
 
 	
-
-	/*
-	//Testing Mergify
-
-	cout << "Before mergify " << endl;
-	for( int i =0; i< arrSize;  i++)
-	{
-		
-		cout << data[i];
-		cout << " " ;
-	}
-
-	
-	//mergify(data, record(index2, size2), record(index1, size1));
-	mergify(data, record(index1, size1), record(index2, size2));
-	cout<< endl << endl << "after mergify " << endl;
-	for( int i =0; i< arrSize;  i++)
-	{	
-		cout << data[i];
-		cout << " " ;
-	}
-	*/
-
-	/*
-	//Testing Insertion sort, Merge up and down
-
-	insertionSort(data, index1, size1);
-	cout<< endl << "after insertion sort" << endl;
-	for( int i =0; i< arrSize;  i++)
-	{
-		
-		cout << data[i];
-		cout << " " ;
-	}
-	insertionSort(data, index2, size2);
-
-	cout<< endl << "after insertion sort" << endl;
-	for( int i =0; i< arrSize;  i++)
-	{
-		
-		cout << data[i];
-		cout << " " ;
-	}
-
-	mergeUp(data, index1 , size1, index2, size2);
-
-	cout<< endl << "after merging" << endl;
-	for( int i =0; i< arrSize;  i++)
-	{
-		
-		cout << data[i];
-		cout << " " ;
-	}
-	cout << endl;
-	//**/ 
-
-
-	/*
 	//Testing GallopRight
-	int find = 1;
-	insertionSort(data, index1, arrSize);
-	int insertHere = gallopRight(data, arrSize, 0, find, true );
-	cout << "insert at index " << insertHere;
-	cout << endl << endl << "If array came earlier.. ";
-	cout << endl << "Testing GallopRight, after duplicates" << endl;
-	cout << "Slice from 0 to " << insertHere << endl;
-	cout << "Then insert " << find << endl;
-	for (int i =0 ; i < arrSize; i++)
+	/*
+	int findMe[3] = {1, 12, 25};
+	for(int i =0; i< 3; i++)
 	{
-		cout << data[i] << " ";
-		if(i == insertHere)
-			cout << " & "; 
-	}
+		int find = findMe[i];
+		insertionSort(data, index1, arrSize);
+		int insertHere = gallopRight(data, arrSize, 0, find, true );
+		cout << endl << "WHERE to insert : " << find ;
+		cout << endl << endl << "If array came earlier.. ";
+		cout << endl << "Testing GallopRight, after duplicates" << endl;
+		cout << "Slice from 0 to " << insertHere << endl;
+		cout << "Then insert " << find << endl;
+		for (int i =0 ; i < arrSize; i++)
+		{
+			cout << data[i] << " ";
+			if(i == insertHere)
+				cout << " & "; 
+		}
 
-	insertHere = gallopRight(data, arrSize, 0, find, false ); 
-	cout << endl << endl  << "If array came later.. " ;
-	cout << endl << "Testing GallopRight, before duplicates" << endl;
-	cout << "Slice from 0 to " << insertHere << endl;
-	cout << "Then insert " << find << endl;
-	for (int i =0 ; i < arrSize; i++)
-	{
-		cout << data[i] << " ";
-		if(i == insertHere)
-			cout << " & "; 
-	}	
+		insertHere = gallopRight(data, arrSize, 0, find, false ); 
+		cout << endl << endl  << "If array came later.. " ;
+		cout << endl << "Testing GallopRight, before duplicates" << endl;
+		cout << "Slice from 0 to " << insertHere << endl;
+		cout << "Then insert " << find << endl;
+		for (int i =0 ; i < arrSize; i++)
+		{
+			cout << data[i] << " ";
+			if(i == insertHere)
+				cout << " & "; 
+		}
+	}
 	//**/
 
 	/*
 	//Testing GallopLeft
-	int find =1;
-	insertionSort(data, index1, arrSize);
-	int insertHere = gallopLeft(data, 0, arrSize -1, find, true );
-	cout << endl << endl << "If array came later.. ";
-	cout << endl << "Testing GallopRight, before duplicates" << endl;
-	cout << "Slice from " << insertHere <<" to " << arrSize-1 <<  endl;
-	cout << "Then insert " << find << endl;
-	for (int i =0 ; i < arrSize; i++)
+	int findMe[3] = {1, 12, 25};
+	for(int i =0; i< 3; i++)
 	{
-		if(i == insertHere)
-			cout << " & "; 
-		else
-			cout << data[i] << " ";
-	}
+		int find =25;
+		insertionSort(data, index1, arrSize);
+		int insertHere = gallopLeft(data, 0, arrSize -1, find, true );
+		cout << endl << endl << "If array came later.. ";
+		cout << endl << "Testing GallopRight, before duplicates" << endl;
+		cout << "Slice from " << insertHere <<" to " << arrSize-1 <<  endl;
+		cout << "Then insert " << find << endl;
+		for (int i =0 ; i < arrSize; i++)
+		{
+			if(i == insertHere)
+				cout << " & "; 
+			else
+				cout << data[i] << " ";
+		}
 
-	insertHere = gallopLeft(data, 0, arrSize -1, find, false );
-	cout << endl << endl  << "If array came earlier.. " ;
-	cout << endl << "Testing GallopRight, after duplicates" << endl;
-	cout << "Slice from " << insertHere <<" to " << arrSize-1 <<  endl;
-	cout << "Then insert " << find << endl;
-	for (int i =0 ; i < arrSize; i++)
-	{
+		insertHere = gallopLeft(data, 0, arrSize -1, find, false );
+		cout << endl << endl  << "If array came earlier.. " ;
+		cout << endl << "Testing GallopRight, after duplicates" << endl;
+		cout << "Slice from " << insertHere <<" to " << arrSize-1 <<  endl;
+		cout << "Then insert " << find << endl;
+		for (int i =0 ; i < arrSize; i++)
+		{
 		
-		if(i == insertHere)
-			cout << " & "; 
-		else 
-			cout << data[i] << " ";
-	}	
+			if(i == insertHere)
+				cout << " & "; 
+			else 
+				cout << data[i] << " ";
+		}
+	}
 	//**/
 
 
@@ -402,22 +362,24 @@ void Sort(T data[], int arrSize)
 
 };
 
-int compute_minrun(int size)
+
+/* 
+ Taken directly from http://svn.python.org/projects/python/trunk/Objects/listobject.c
+ Eric was the one who showed this to me. 
+ */
+int compute_minrun(int n)
 {
 	//take first 6 bits, if any of other bits are set then
 	//adds one
 
-	int mySize = 13;
+	int r = 0;  /* becomes 1 if any 1 bits are shifted off */
 
-	if(size < mySize)
-		return size;
-	else return mySize;
-
-
-	if(size <64)
-		return size;
-
-	return 64;
+    assert(n >= 0);
+    while (n >= 64) {
+        r |= n & 1;
+        n >>= 1;
+    }
+    return n + r;
 
 };
 
@@ -479,7 +441,7 @@ int gallopRight(T arr[], int upperIndex, int start, T target, bool earlier)
 		upper += skip;
 	}
 
-	if(upper > upperIndex)
+	if(upper >= upperIndex)
 		upper = upperIndex - 1;
 
 	//Binary search within the interval, inclusive. 
@@ -547,7 +509,7 @@ int gallopLeft(T arr[], int lowerIndex, int start, T target, bool later)
 		lower -= skip;
 	}
 
-	if(lower< lowerIndex)
+	if(lower<= lowerIndex)
 		lower = lowerIndex + 1;
 
 	//Binary search within the interval, inclusive. 
@@ -631,9 +593,14 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 		{
 			data[i3++] = data[i2++];
 			if( arrWin == START || arrWin == TWO)
+			{
 				++winning;
+			}
 			else 
-				winning =0;
+			{
+				winning =1;
+			}
+			arrWin = TWO;
 		}
 		else //Since arr1 comes earlier in original array,
 			//arr1 gets copied in if arr1 and data are equal. 
@@ -643,6 +610,7 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 				++winning;
 			else
 				winning = 0;
+			arrWin = ONE;
 		}
 
 		//Can we start galloping?
@@ -717,20 +685,22 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 						cout <<endl <<"Copying the slice " <<endl;
 					int sliceSize = 0;
 					
-					for(int i = i2; i <= endIndex; i++)
+					if(endIndex >i2)	//If there should be no slice
 					{
-						data[i3++] = data[i];
-						
-						if(GALLOP_DEBUG)
+						for(int i = i2; i <= endIndex; i++)
 						{
-							cout << data[i] << " ";
-							if((i % 15) == 0)
-								cout <<endl ;
+							data[i3++] = data[i];
+						
+							if(GALLOP_DEBUG)
+							{
+								cout << data[i] << " ";
+								if((i % 15) == 0)
+									cout <<endl ;
+							}
+							//**/
+							sliceSize++;
 						}
-						//**/
-						sliceSize++;
 					}
-					
 					if(GALLOP_DEBUG)
 						cout << endl <<"Copying target" << findMe <<endl;
 					data[i3++] = findMe;
@@ -812,7 +782,10 @@ void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
 		{
 			data[i3--] = data[i1--];
 			if(arrWin == START || arrWin == ONE)
+			{
 				++winning;
+				arrWin = ONE;
+			}
 			else
 				winning = 0;
 		}
@@ -821,7 +794,10 @@ void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
 		{
 			data[i3--] = arr2[i2--];	
 			if(arrWin == START || arrWin == TWO)
+			{
 				++winning;
+				arrWin = TWO;
+			}
 			else
 				winning = 0;
 		}
@@ -829,8 +805,8 @@ void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
 
 		//can we start galloping>?
 		
-		//if(false)
-		if(winning > MIN_GALLOP)
+		if(false)
+		//if(winning > MIN_GALLOP)
 		{
 			//Continue in gallop until we fail twice in a row
 			if(GALLOP_DEBUG)
@@ -863,18 +839,22 @@ void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
 					for(int i =i1; i >= endIndex; i--)
 					{
 						data[i3--] = data[i];
-						
-						if(GALLOP_DEBUG)
+					
+						//**/
+						sliceSize++;
+					}
+
+					if(GALLOP_DEBUG)
+					{
+						for(int i =endIndex; i <= i1; i++)	
 						{
 							cout << data[i] << " ";
 							if((i % 15) == 0)
 								cout <<endl ;
 						}
-						//**/
-						sliceSize++;
-					}
-					if(GALLOP_DEBUG)
+
 						cout << endl <<"Copying target" << findMe <<endl;
+					}
 					data[i3--] = findMe;
 					i1 = endIndex-1;
 					//Do we continue galloping?
