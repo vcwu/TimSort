@@ -4,7 +4,7 @@
 #include <utility>
 using namespace std;
 
-
+#define MIN_GALLOP 7
 #define DEBUG true
 #define GALLOP_DEBUG true
 
@@ -127,6 +127,20 @@ inserting target.
 template <typename T>
 int gallopRight(T arr[], int upperIndex, int start, T target, bool earlier);
 
+/**
+gallopLeft
+
+Gallop to find the index of where target would go in the array.
+lowerIndex - the lowerbound index, non inclusive. 
+bool later - Depending on if the array came first, in order to maintain stability,
+	will return before or after duplicates
+
+Returns the index of the first element that should be sliced before
+inserting target.
+*/
+template <typename T>
+int gallopLeft(T arr[], int lowerIndex, int start, T target, bool later);
+
 
 template <typename T>
 void Sort(T data[], int arrSize) 
@@ -203,7 +217,7 @@ void Sort(T data[], int arrSize)
 
 	/*
 	//Testing GallopRight
-	int find = 12;
+	int find = 1;
 	insertionSort(data, index1, arrSize);
 	int insertHere = gallopRight(data, arrSize, 0, find, true );
 	cout << "insert at index " << insertHere;
@@ -231,13 +245,36 @@ void Sort(T data[], int arrSize)
 	}	
 	//**/
 
-
-	/*
-	//Testing Gallop, in mergeDOwn
-	insertionSort(data, index1, size1);
-	insertionSort(data, index2, size2);
-	mergeDown(data, index1 , size1, index2, size2);
 	
+	//Testing GallopLeft
+	int find =1;
+	insertionSort(data, index1, arrSize);
+	int insertHere = gallopLeft(data, 0, arrSize -1, find, true );
+	cout << endl << endl << "If array came later.. ";
+	cout << endl << "Testing GallopRight, before duplicates" << endl;
+	cout << "Slice from " << insertHere <<" to " << arrSize-1 <<  endl;
+	cout << "Then insert " << find << endl;
+	for (int i =0 ; i < arrSize; i++)
+	{
+		if(i == insertHere)
+			cout << " & "; 
+		else
+			cout << data[i] << " ";
+	}
+
+	insertHere = gallopLeft(data, 0, arrSize -1, find, false );
+	cout << endl << endl  << "If array came earlier.. " ;
+	cout << endl << "Testing GallopRight, after duplicates" << endl;
+	cout << "Slice from " << insertHere <<" to " << arrSize-1 <<  endl;
+	cout << "Then insert " << find << endl;
+	for (int i =0 ; i < arrSize; i++)
+	{
+		
+		if(i == insertHere)
+			cout << " & "; 
+		else 
+			cout << data[i] << " ";
+	}	
 	//**/
 
 
@@ -425,13 +462,6 @@ void insertionSort(T data[], int index, int size)
 	}
 };
 
-
-template <typename T>
-int gallopRight(vector<T> & v , int upperIndex, int start, T target, bool earlier)
-{
-	return gallopRight(&v[0], upperIndex, start, target, earlier);
-}
-
 template <typename T>
 int gallopRight(T arr[], int upperIndex, int start, T target, bool earlier)
 {
@@ -500,6 +530,74 @@ int gallopRight(T arr[], int upperIndex, int start, T target, bool earlier)
 	}
 }
 
+template <typename T>
+int gallopLeft(T arr[], int lowerIndex, int start, T target, bool later)
+{
+	//Search for target in the array by using binary search.
+
+	int skip = 1;
+	int upper = start;
+	int lower = start -1 ;
+
+	//Don't want to jump past edge.
+	while(lower > lowerIndex && arr[lower] > target)
+	{
+		skip = 2*skip +1;	//skips in 1,3,7, etc
+		upper = lower;
+		lower -= skip;
+	}
+
+	if(lower< lowerIndex)
+		lower = lowerIndex + 1;
+
+	//Binary search within the interval, inclusive. 
+	//Code taken from Data Structures and Algorithms in C++
+	// by Adam Drozdek
+
+	/*
+	If target is 7, 
+
+	^ 7 7 7		returns before if array came later and target
+				needs to be inserted towards the right AFTER the slice
+	
+	7 7 7 ^		returns AFTEr if array came earlier and target
+				needs to be inserted towards the right BEFORE the slice's duplicate
+	*/
+	
+	int lo = lower , hi = upper, mid =( lo + hi) /2;
+	int atDuplicates;
+	while( lo <= hi)
+	{
+		mid = (lo + hi)/2;
+		if( target < arr[mid] )
+			hi = mid - 1;
+		else if (arr[mid] < target)
+			lo = mid + 1;
+		else //found target
+		{
+			atDuplicates = mid;
+			break;	
+		}
+	}
+
+	atDuplicates = mid;
+
+	if(later)
+		
+		return atDuplicates -1;
+	else
+	{
+		//Need to return the index of the last duplicates, if any.
+		int afterDuplicates = atDuplicates;
+		while(afterDuplicates <=  start && 
+			arr[afterDuplicates] == target)	//Don't want to search past bound
+		{
+			++afterDuplicates;
+		}	
+		return afterDuplicates;
+	}
+
+}
 
 template <typename T>
 void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
@@ -520,8 +618,6 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 	int i1 = 0;			//index of first array
 	int i2 = begin2;	//index of second array
 	int i3 = begin1;	//index we are inserting into
-
-	const int MIN_GALLOP = 7;
 
 	enum {START, ONE, TWO};
 	int arrWin = START;
@@ -705,15 +801,151 @@ void mergeUp(T data[], int begin1, int size1, int begin2, int size2)
 	int i2 = size2 -1;	   	//index of second array
 	int i3 = begin2+size2 -1;//index we are inserting into
 
+	enum {START, ONE, TWO};
+	int arrWin = START;
+	int winning = 0;
+
 	//Once we reach the end of an array...
 	while(i1 >= begin1 && i2 >= 0)
 	{
 		if(arr2[i2] < data[i1])
-			data[i3--] = data[i1--];	
+		{
+			data[i3--] = data[i1--];
+			if(arrWin == START || arrWin == ONE)
+				++winning;
+			else
+				winning = 0;
+		}
 		else //if they are equal, arr2 will be copied first
 			//to maintain stability
+		{
 			data[i3--] = arr2[i2--];	
+			if(arrWin == START || arrWin == TWO)
+				++winning;
+			else
+				winning = 0;
+		}
+
+
+		//can we start galloping>?
 		
+		//if(false)
+		if(winning > MIN_GALLOP)
+		{
+			//Continue in gallop until we fail twice in a row
+			if(GALLOP_DEBUG)
+			{
+				cout << "================" << endl;
+				cout << endl << "ENTERING GALLOP! " << endl;
+			}
+			int failCount = 0;
+			
+			while(failCount < 2 && i1 >= begin1 && i2 >= 0 )
+			{
+				//
+				int endIndex;
+				
+				if(arrWin == ONE)
+				{
+					//Find indicies of slice to copy over.
+					//Also update indicies for next gallop.
+					int findMe = arr2[i2--];
+					endIndex = 
+						gallopLeft(data, begin1-1, i1, findMe, false);
+					
+					arrWin = TWO;
+
+					//Copy contents of slice directly into mergespace, 
+					//then target.
+					int sliceSize = 0;
+					if(GALLOP_DEBUG)
+						cout <<"Copying the slice " << endl ;
+					for(int i =i1; i >= endIndex; i--)
+					{
+						data[i3--] = data[i];
+						
+						if(GALLOP_DEBUG)
+						{
+							cout << data[i] << " ";
+							if((i % 15) == 0)
+								cout <<endl ;
+						}
+						//**/
+						sliceSize++;
+					}
+					if(GALLOP_DEBUG)
+						cout << endl <<"Copying target" << findMe <<endl;
+					data[i3--] = findMe;
+					i1 = endIndex-1;
+					//Do we continue galloping?
+					if(sliceSize < MIN_GALLOP)
+					{
+						failCount ++;
+						if(GALLOP_DEBUG)
+							cout << "FAILURE! " << failCount <<endl;
+					}
+					else
+						failCount = 0;
+				}
+				else	//Slicing from array2...
+				{
+					//Find indicies of slice to copy over.
+					//Also update indicies for next gallop.
+					int findMe = data[i1--];
+					endIndex = 
+						gallopLeft(arr2, -1, i2, findMe, true);
+					arrWin = ONE;
+
+					//Copy contents of slice directly into mergespace, 
+					//then target. 
+					if(GALLOP_DEBUG)
+						cout <<endl <<"Copying the slice " <<endl;
+					int sliceSize = 0;
+					
+					for(int i = i2; i >= endIndex; i--)
+					{
+						data[i3--] = arr2[i];
+						
+						if(GALLOP_DEBUG)
+						{
+							cout << arr2[i] << " ";
+							if((i % 15) == 0)
+								cout <<endl ;
+						}
+						//**/
+						sliceSize++;
+					}
+					
+					if(GALLOP_DEBUG)
+						cout << endl <<"Copying target" << findMe <<endl;
+					data[i3--] = findMe;
+					i2 = endIndex-1;
+					//Do we continue galloping?
+					if(sliceSize < MIN_GALLOP)
+					{
+						failCount ++;
+						if(GALLOP_DEBUG)
+								cout << "FAILURE! " << failCount <<endl;
+					}
+					else
+						failCount = 0;
+				}
+				cout <<endl;
+			}
+
+			if(GALLOP_DEBUG)
+			{
+				cout << "Exiting gallop " << endl;
+				cout << "================" << endl;
+			}
+			winning = 0;
+			//**/
+
+
+		}
+
+
+
 	}
 
 	//Load the remaining stuff. 

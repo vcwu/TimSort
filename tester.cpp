@@ -33,11 +33,11 @@ int main()
 	
 	*/
 
-	/*
-	ifstream fin("runs.txt");
-	//ifstream fin("smallTest.txt");
+	
+	//ifstream fin("runs.txt");
+	ifstream fin("smallTest.txt");
 	//const int size = 29;
-	const int size = 500;	//trouble with a million 
+	const int size = 25;	//trouble with a million 
 	int* hello = new int[size];
 	//int hello[size];
 	int temp;
@@ -53,11 +53,13 @@ int main()
 	//**/
 
 	int* gallop = new int[505];
-	//Testing Galloping
+
+	/*
+	//Testing Galloping, gallopRight
 	
 	//Creating an array to look somewhat like
 	//0->500 || 100 200 300 400 500
-	//in order to force gallop mode to continue
+	//in order to force gallopRight to continue
 	int num = 100;
 	for(int i =0; i < 505; i++)
 	{
@@ -70,6 +72,48 @@ int main()
 		else
 			gallop[i] = i;
 	}
+	Sort(gallop, 505);
+	
+	cout << endl 
+	<< "PRINTING gallop " << endl << endl;
+
+	
+	for( int i =0; i< 505;  i++)
+	{
+		cout << gallop[i];
+		cout << " " ;
+		if((i+1)%9 == 0)
+			cout << endl;
+	}
+	//**/
+
+	/*
+	//Testing Galloping, gallopLeft
+	
+	//Creating an array to look somewhat like
+	// 500 ->0 || 500 400 300 200 100
+	//in order to force gallopLeft to continue
+	int num = 500;
+	for(int i =0; i < 505; i++)
+	{
+		
+		if(i < 500)
+			gallop[i] = 500-i;
+		else
+		{
+			gallop[i] = num;
+			num-=100;
+		}
+	}
+
+	 for( int i =0; i< 505;  i++)
+	{
+		cout << gallop[i];
+		cout << " " ;
+		if((i+1)%9 == 0)
+			cout << endl;
+	}
+
 	Sort(gallop, 505);
 	
 	cout << endl 
@@ -99,7 +143,7 @@ int main()
 	}
 	//**/
 
-	//Sort(hello, size);
+	Sort(hello, size);
 	
 	/*
 	cout << endl 
