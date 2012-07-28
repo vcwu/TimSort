@@ -33,11 +33,11 @@ int main()
 	
 	*/
 
+	/*
 	ifstream fin("runs.txt");
-	//ifstream fout("out.txt");
 	//ifstream fin("smallTest.txt");
 	//const int size = 29;
-	const int size = 100000;	//trouble with a million 
+	const int size = 500;	//trouble with a million 
 	int* hello = new int[size];
 	//int hello[size];
 	int temp;
@@ -50,6 +50,41 @@ int main()
 		fin >> temp;
 		hello[i] = temp;
 	}
+	//**/
+
+	int* gallop = new int[505];
+	//Testing Galloping
+	
+	//Creating an array to look somewhat like
+	//0->500 || 100 200 300 400 500
+	//in order to force gallop mode to continue
+	int num = 100;
+	for(int i =0; i < 505; i++)
+	{
+		
+		if(i< 5)
+		{
+			gallop[i] = num;
+			num+=100;
+		}
+		else
+			gallop[i] = i;
+	}
+	Sort(gallop, 505);
+	
+	cout << endl 
+	<< "PRINTING gallop " << endl << endl;
+
+	
+	for( int i =0; i< 505;  i++)
+	{
+		cout << gallop[i];
+		cout << " " ;
+		if((i+1)%9 == 0)
+			cout << endl;
+	}
+	//**/
+
 
 
 	/*
@@ -64,23 +99,24 @@ int main()
 	}
 	//**/
 
-	Sort(hello, size);
+	//Sort(hello, size);
 	
-	
+	/*
 	cout << endl 
 	<< "PRINTING HELLO " << endl << endl;
 
-	for( int i =0; i< 20;  i++)
+	
+	for( int i =0; i< size;  i++)
 	{
 		cout << hello[i];
 		cout << " " ;
 		if((i+1)%6 == 0)
 			cout << endl;
 	}
-	
+	//**/
 
 	//fin.close();
-	delete[] hello;
+	//delete[] hello;
 
 	int me;
 	cin >> me;

@@ -5,7 +5,8 @@
 using namespace std;
 
 
-#define DEBUG false
+#define DEBUG true
+#define GALLOP_DEBUG true
 
 /*
 PRE: Array 'data' is full in at least the first ArrSize 
@@ -231,6 +232,15 @@ void Sort(T data[], int arrSize)
 	//**/
 
 
+	/*
+	//Testing Gallop, in mergeDOwn
+	insertionSort(data, index1, size1);
+	insertionSort(data, index2, size2);
+	mergeDown(data, index1 , size1, index2, size2);
+	
+	//**/
+
+
 
 
 	/*
@@ -360,7 +370,7 @@ int compute_minrun(int size)
 	//take first 6 bits, if any of other bits are set then
 	//adds one
 
-	int mySize = 50;
+	int mySize = 13;
 
 	if(size < mySize)
 		return size;
@@ -456,7 +466,7 @@ int gallopRight(T arr[], int upperIndex, int start, T target, bool earlier)
 				needs to be inserted after the slice
 	*/
 	
-	int lo = lower, mid, hi = upper;
+	int lo = lower , hi = upper, mid =( lo + hi) /2;
 	int atDuplicates;
 	while( lo <= hi)
 	{
@@ -540,18 +550,18 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 		}
 
 		//Can we start galloping?
-		if(false)
-		//if(winning > MIN_GALLOP)
+		
+		if(winning > MIN_GALLOP)
 		{
 			//Continue in Gallop until we fail twice in a row. 	
-			if(DEBUG)
+			if(GALLOP_DEBUG)
 			{
+				cout << "================" << endl;
 				cout << endl << "ENTERING GALLOP! " << endl;
 			}
 			int failCount = 0;
-			while(failCount < 2)
+			while(failCount < 2 &&i1 < size1 && i2 < begin2+size2 )
 			{
-				int targetIndex; 
 				int endIndex;
 				
 				if(arrWin == ONE)
@@ -561,26 +571,38 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 					int findMe = data[i2++];
 					endIndex = 
 						gallopRight(arr1, size1, i1, findMe, true);
-					i1 = endIndex+1;
+					
 					arrWin = TWO;
 
 					//Copy contents of slice directly into mergespace, 
 					//then target.
 					int sliceSize = 0;
-					if(DEBUG)
-						cout <<"Copying the slice " << endl;
+					if(GALLOP_DEBUG)
+						cout <<"Copying the slice " << endl ;
 					for(int i =i1; i <= endIndex; i++)
 					{
 						data[i3++] = arr1[i];
-						if(DEBUG)
-							cout << arr1[i] << " ";
+						
+						if(GALLOP_DEBUG)
+						{
+							cout << data[i] << " ";
+							if((i % 15) == 0)
+								cout <<endl ;
+						}
+						//**/
 						sliceSize++;
 					}
+					if(GALLOP_DEBUG)
+						cout << endl <<"Copying target" << findMe <<endl;
 					data[i3++] = findMe;
-
+					i1 = endIndex+1;
 					//Do we continue galloping?
 					if(sliceSize < MIN_GALLOP)
+					{
 						failCount ++;
+						if(GALLOP_DEBUG)
+							cout << "FAILURE! " << failCount <<endl;
+					}
 					else
 						failCount = 0;
 				}
@@ -591,37 +613,54 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 					int findMe = arr1[i1++];
 					endIndex = 
 						gallopRight(data, begin2 + size2, i2, findMe, false);
-					i1 = endIndex+1;
-					arrWin = TWO;
+					arrWin = ONE;
 
 					//Copy contents of slice directly into mergespace, 
 					//then target. 
-					if(DEBUG)
-						cout <<"Copying the slice " << endl;
+					if(GALLOP_DEBUG)
+						cout <<endl <<"Copying the slice " <<endl;
 					int sliceSize = 0;
+					
 					for(int i = i2; i <= endIndex; i++)
 					{
 						data[i3++] = data[i];
-						if(DEBUG)
+						
+						if(GALLOP_DEBUG)
+						{
 							cout << data[i] << " ";
+							if((i % 15) == 0)
+								cout <<endl ;
+						}
+						//**/
 						sliceSize++;
 					}
-					if(DEBUG)
-						cout << endl <<"Copying target" << findMe;
+					
+					if(GALLOP_DEBUG)
+						cout << endl <<"Copying target" << findMe <<endl;
 					data[i3++] = findMe;
-
+					i2 = endIndex+1;
 					//Do we continue galloping?
 					if(sliceSize < MIN_GALLOP)
+					{
 						failCount ++;
+						if(GALLOP_DEBUG)
+								cout << "FAILURE! " << failCount <<endl;
+					}
 					else
 						failCount = 0;
 				}
+				cout <<endl;
 			}
 
-			if(DEBUG)
+			if(GALLOP_DEBUG)
+			{
 				cout << "Exiting gallop " << endl;
-			
+				cout << "================" << endl;
+			}
+			winning = 0;		
 		}
+		
+		
 		//Exiting galloping mode.
 		//**/
 	}
