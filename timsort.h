@@ -245,7 +245,7 @@ void Sort(T data[], int arrSize)
 	}	
 	//**/
 
-	
+	/*
 	//Testing GallopLeft
 	int find =1;
 	insertionSort(data, index1, arrSize);
