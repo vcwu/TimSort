@@ -33,11 +33,13 @@ int main()
 	
 	*/
 
-	//ifstream fin("runs.txt");
-	ifstream fin("smallTest.txt");
-	const int size = 29;
-	//const int size = 10;
-	int hello[size];
+	ifstream fin("runs.txt");
+	//ifstream fout("out.txt");
+	//ifstream fin("smallTest.txt");
+	//const int size = 29;
+	const int size = 100000;	//trouble with a million 
+	int* hello = new int[size];
+	//int hello[size];
 	int temp;
 	
 	int i=0;
@@ -50,7 +52,7 @@ int main()
 	}
 
 
-	
+	/*
 	cout << "Before Sort" << endl << endl;
 
 	for( int i =0; i< size;  i++)
@@ -60,7 +62,7 @@ int main()
 		if((i+1)%6 == 0)
 			cout << endl;
 	}
-	
+	//**/
 
 	Sort(hello, size);
 	
@@ -68,7 +70,7 @@ int main()
 	cout << endl 
 	<< "PRINTING HELLO " << endl << endl;
 
-	for( int i =0; i< size;  i++)
+	for( int i =0; i< 20;  i++)
 	{
 		cout << hello[i];
 		cout << " " ;
@@ -78,7 +80,7 @@ int main()
 	
 
 	//fin.close();
-
+	delete[] hello;
 
 	int me;
 	cin >> me;

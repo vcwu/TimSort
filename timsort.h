@@ -200,7 +200,7 @@ void Sort(T data[], int arrSize)
 	//**/ 
 
 
-
+	/*
 	//Testing GallopRight
 	int find = 12;
 	insertionSort(data, index1, arrSize);
@@ -360,7 +360,7 @@ int compute_minrun(int size)
 	//take first 6 bits, if any of other bits are set then
 	//adds one
 
-	int mySize = 5;
+	int mySize = 50;
 
 	if(size < mySize)
 		return size;
@@ -415,6 +415,12 @@ void insertionSort(T data[], int index, int size)
 	}
 };
 
+
+template <typename T>
+int gallopRight(vector<T> & v , int upperIndex, int start, T target, bool earlier)
+{
+	return gallopRight(&v[0], upperIndex, start, target, earlier);
+}
 
 template <typename T>
 int gallopRight(T arr[], int upperIndex, int start, T target, bool earlier)
@@ -494,7 +500,7 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 
 	//Make two separate arrays, to make room to write 
 	//to original array.
-	T* arr1  = new T[size1];
+	T* arr1 = new T[size1];
 
 	for(int i =begin1; i< begin1+size1; i++)
 	{
@@ -561,9 +567,13 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 					//Copy contents of slice directly into mergespace, 
 					//then target.
 					int sliceSize = 0;
+					if(DEBUG)
+						cout <<"Copying the slice " << endl;
 					for(int i =i1; i <= endIndex; i++)
 					{
 						data[i3++] = arr1[i];
+						if(DEBUG)
+							cout << arr1[i] << " ";
 						sliceSize++;
 					}
 					data[i3++] = findMe;
@@ -586,12 +596,18 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 
 					//Copy contents of slice directly into mergespace, 
 					//then target. 
+					if(DEBUG)
+						cout <<"Copying the slice " << endl;
 					int sliceSize = 0;
 					for(int i = i2; i <= endIndex; i++)
 					{
 						data[i3++] = data[i];
+						if(DEBUG)
+							cout << data[i] << " ";
 						sliceSize++;
 					}
+					if(DEBUG)
+						cout << endl <<"Copying target" << findMe;
 					data[i3++] = findMe;
 
 					//Do we continue galloping?
@@ -615,9 +631,9 @@ void mergeDown(T data[], int begin1, int size1, int begin2, int size2)
 	{	
 
 		//copy the contents of secondArray
-		for(int i = 0; i < i2-begin2; i++ )
+		for(int y = 0; y < size2-i2; y++ )
 		{
-			data[i3+i] = data[i2+i];
+			data[i3+y] = data[i2+y];
 		}
 	}
 	
@@ -725,12 +741,14 @@ void insert(T data[], vector<record>* cake, int begin, int size)
 	if(DEBUG)
 	{	
 		cout << endl << "PUTTING ON STACK" << endl;
+		/*
 		for(int i =0; i< size; i++)
 		{
 			cout << data[begin+i] << " " ;
 			if(i+1 % 6 == 0)
 				cout <<endl;
 		}
+		//**/
 		cout << endl;
 	}
 
